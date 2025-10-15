@@ -4,7 +4,7 @@ from browser_use import Agent, Browser, ChatOpenAI
 
 JOB_FINDING_TASK_TEMPLATE = """
     1. Open the {website} homepage.
-    2. Locate the search bar and enter the keyword 'python'.
+    2. Locate the search bar and enter the keyword '{search_term}'.
     3. While focusing the search input, press Enter to initiate the search.
     4. Wait until the search results page fully loads.
     5. Get details of the top {number_of_jobs} job listings one by one.
@@ -22,7 +22,11 @@ async def get_browser() -> Browser:
     )
     return browser
 
-async def get_job_postings(website: str, number_of_jobs: int = 1) -> str:
+async def get_job_postings(
+        website: str,
+        number_of_jobs: int = 1,
+        search_term: str = ""
+        ) -> str:
 
     # Initialize the browser
     browser = await get_browser()
@@ -37,7 +41,8 @@ async def get_job_postings(website: str, number_of_jobs: int = 1) -> str:
     agent = Agent(
         task=JOB_FINDING_TASK_TEMPLATE.format(
             website=website,
-            number_of_jobs=number_of_jobs
+            number_of_jobs=number_of_jobs,
+            search_term=search_term
         ),
         llm=ChatOpenAI(model=model_name, temperature=0),
         browser_session=browser,

@@ -10,38 +10,32 @@ async def main():
     print("🚀 Starting Job Crawler Agent...")
     print("=" * 50)
     
-    # Default configuration
-    default_website = "https://www.indeed.com"
-    default_job_count = 5
+    # Check if all required parameters are provided
+    if len(sys.argv) != 4:
+        print("❌ Error: All parameters are required!")
+        print("Usage: python main.py <website_url> <job_count> <search_term>")
+        print("Example: python main.py \"https://www.indeed.com\" 5 \"python developer\"")
+        return 1
     
-    # Get user input or use defaults
-    if len(sys.argv) > 1:
-        website = sys.argv[1]
-    else:
-        website = input(f"Enter job website URL (default: {default_website}): ").strip()
-        if not website:
-            website = default_website
+    # Get parameters from command line
+    website = sys.argv[1]
     
-    if len(sys.argv) > 2:
-        try:
-            job_count = int(sys.argv[2])
-        except ValueError:
-            print("⚠️  Invalid job count, using default value.")
-            job_count = default_job_count
-    else:
-        job_count_input = input(f"Enter number of jobs to extract (default: {default_job_count}): ").strip()
-        if job_count_input.isdigit():
-            job_count = int(job_count_input)
-        else:
-            job_count = default_job_count
+    try:
+        job_count = int(sys.argv[2])
+    except ValueError:
+        print("❌ Error: Job count must be a valid integer!")
+        return 1
+    
+    search_term = sys.argv[3]
     
     print(f"\n🎯 Target Website: {website}")
     print(f"📊 Jobs to Extract: {job_count}")
+    print(f"🔍 Search Term: {search_term}")
     print("\n🔄 Starting job extraction...")
     
     try:
         # Run the job extraction
-        results = await get_job_postings(website, job_count)
+        results = await get_job_postings(website, job_count, search_term)
         
         print("\n✅ Job extraction completed!")
         print("=" * 50)
@@ -57,6 +51,7 @@ async def main():
                 with open(filename, 'w', encoding='utf-8') as f:
                     f.write(f"Job Extraction Results\n")
                     f.write(f"Website: {website}\n")
+                    f.write(f"Search Term: {search_term}\n")
                     f.write(f"Date: {asyncio.get_event_loop().time()}\n")
                     f.write("=" * 50 + "\n")
                     # Ensure results is converted to string

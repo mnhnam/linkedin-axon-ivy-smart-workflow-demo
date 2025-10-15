@@ -74,13 +74,19 @@ After completing the setup steps above, your web crawler agent is ready to use.
 
 ### Running the Application
 
-**2. Command Line Arguments:**
+**Command Line Usage:**
 
 ```powershell
-python main.py "https://www.vietnamworks.com" 3
+python main.py "https://www.vietnamworks.com" 3 "data science"
 ```
 
-This will extract 10 Python jobs from LinkedIn.
+This will extract 3 "data science" jobs from vietnamworks.
+
+**All parameters are required:**
+
+- First parameter: Website URL (required)
+- Second parameter: Number of jobs to extract (required)
+- Third parameter: Search term (required)
 
 ### Features
 
@@ -88,8 +94,6 @@ The project uses:
 
 - **Playwright** for browser automation and web scraping
 - **browser-use** for enhanced browser interaction capabilities
-- **OpenAI GPT-4** for intelligent job extraction and parsing
-- **Headless browsing** for better server compatibility
 
 ### Output Options
 
@@ -99,16 +103,22 @@ The project uses:
 
 ## Environment Configuration
 
-The project includes a `.env` file for environment-specific configuration. **Important:** You need to configure your OpenAI API key before running the crawler.
+### Setting up your .env file
 
-### Required Configuration
+1. Copy the example environment file:
 
-The `.env` file in the project root contains configurations for the project:
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
-```env
-OPENAI_API_KEY=your_openai_api_key_here
-DEFAULT_MODEL=gpt-4.1-mini
-```
+2. Edit the `.env` file and replace `your_openai_api_key_here` with your actual OpenAI API key:
+
+   ```env
+   OPEN_AI_API_KEY=sk-your-actual-api-key-here
+   DEFAULT_MODEL=gpt-4.1-mini
+   ```
+
+**Important:** You must configure your OpenAI API key before running the crawler.
 
 ### Configuration Options
 
@@ -136,21 +146,11 @@ When working on this project:
 
 ## Common Issues
 
-### File Saving Error
-If you encounter "write() argument must be str, not AgentHistoryList" error when saving results:
-- This has been fixed in the latest version
-- The agent now properly converts history data to string format before saving
-
-### General Troubleshooting
-- Ensure your OpenAI API key is correctly set in `.env`
-- Make sure you're running from the project root directory
-- Check that all dependencies are installed with `pip install -r requirements.txt`
-
-**Note**
+### Stop agent
 
 Press `Ctrl + C` to force stop the agent
 
-## Deactivating the Virtual Environment
+### Deactivating the Virtual Environment
 
 When you're done working on the project, deactivate the virtual environment:
 
