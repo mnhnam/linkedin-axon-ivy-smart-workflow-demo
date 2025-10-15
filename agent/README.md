@@ -55,52 +55,6 @@ This script will:
 - Install Playwright's Chromium browser with system dependencies
 - Set up the necessary browser automation environment
 
-## Project Structure
-
-```plain
-agent/
-├── src/
-│   └── agent.py        # Core web crawler agent logic
-├── .env                # Environment variables configuration
-├── main.py             # Main entry point to run the application
-├── requirements.txt    # Python dependencies
-├── setup.bat          # Project initialization script
-└── README.md          # This file
-```
-
-## Usage
-
-After completing the setup steps above, your web crawler agent is ready to use.
-
-### Running the Application
-
-**Command Line Usage:**
-
-```powershell
-python main.py "https://www.vietnamworks.com" 3 "data science"
-```
-
-This will extract 3 "data science" jobs from vietnamworks.
-
-**All parameters are required:**
-
-- First parameter: Website URL (required)
-- Second parameter: Number of jobs to extract (required)
-- Third parameter: Search term (required)
-
-### Features
-
-The project uses:
-
-- **Playwright** for browser automation and web scraping
-- **browser-use** for enhanced browser interaction capabilities
-
-### Output Options
-
-- View results in the terminal
-- Optionally save results to a text file
-- Results include job titles, descriptions, and other relevant information
-
 ## Environment Configuration
 
 ### Setting up your .env file
@@ -143,6 +97,80 @@ When working on this project:
    ```
 
 4. Test changes in the isolated virtual environment
+
+## Project Structure
+
+```plain
+agent/
+├── src/
+│   ├── abstract_agent.py      # Abstract base class for all agents
+│   ├── agent_factory.py       # Factory to create appropriate agents
+│   ├── itviec_agent.py        # ITViec-specific job crawler
+│   └── vietnamworks_agent.py  # VietnamWorks-specific job crawler
+├── .env                       # Environment variables configuration
+├── .env.example              # Environment variables template
+├── main.py                   # Main entry point to run the application
+├── requirements.txt          # Python dependencies
+├── setup.bat                # Project initialization script
+└── README.md                # This file
+```
+
+## Agent Architecture
+
+The project uses an abstract agent pattern for extensibility and maintainability:
+
+```
+AbstractAgent (abstract_agent.py)
+├── Provides common functionality:
+│   ├── Browser initialization
+│   ├── Environment configuration
+│   └── Job posting extraction flow
+│
+├── ITViecAgent (itviec_agent.py)
+│   ├── Supports: https://itviec.com/
+│   └── Custom task template for ITViec website structure
+│
+└── VietnamWorksAgent (vietnamworks_agent.py)
+    ├── Supports: https://www.vietnamworks.com/
+    └── Custom task template for VietnamWorks website structure
+
+AgentFactory (agent_factory.py)
+└── URL-based agent selection:
+    ├── "itviec.com" → ITViecAgent
+    └── "vietnamworks.com" → VietnamWorksAgent
+```
+
+**How it works:**
+1. Main application calls `create_agent(url)` 
+2. Factory analyzes URL and returns appropriate agent
+3. Agent uses its custom task template for the specific website
+4. Results are automatically saved to `result.txt`
+
+## Usage
+
+After completing the setup steps above, your web crawler agent is ready to use.
+
+### Running the Application
+
+**Command Line Usage:**
+
+```powershell
+python main.py "https://www.vietnamworks.com" 3 "data science"
+```
+
+This will extract 3 "data science" jobs from vietnamworks.
+
+**All parameters are required:**
+
+- First parameter: Website URL (required)
+- Second parameter: Number of jobs to extract (required)
+- Third parameter: Search term (required)
+
+### Output Options
+
+- View results in the terminal
+- Results automatically saved to `result.txt`
+- Results include job titles, descriptions, and other relevant information
 
 ## Common Issues
 

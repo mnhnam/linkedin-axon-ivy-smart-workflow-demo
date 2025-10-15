@@ -1,7 +1,7 @@
 import asyncio
 import sys
 import os
-from src.agent import get_job_postings
+from src.agent_factory import create_agent, get_supported_websites
 
 async def main():
     """
@@ -14,7 +14,8 @@ async def main():
     if len(sys.argv) != 4:
         print("❌ Error: All parameters are required!")
         print("Usage: python main.py <website_url> <job_count> <search_term>")
-        print("Example: python main.py \"https://www.indeed.com\" 5 \"python developer\"")
+        print("Example: python main.py \"https://itviec.com\" 5 \"python developer\"")
+        print(f"Supported websites: {', '.join(get_supported_websites())}")
         return 1
     
     # Get parameters from command line
@@ -28,14 +29,22 @@ async def main():
     
     search_term = sys.argv[3]
     
+    # Get the appropriate agent for the website
+    agent = create_agent(website, search_term, job_count)
+    if not agent:
+        print(f"❌ Error: No agent found for website: {website}")
+        print(f"Supported websites: {', '.join(get_supported_websites())}")
+        return 1
+    
     print(f"\n🎯 Target Website: {website}")
     print(f"📊 Jobs to Extract: {job_count}")
     print(f"🔍 Search Term: {search_term}")
+    print(f"🤖 Using Agent: {agent.__class__.__name__}")
     print("\n🔄 Starting job extraction...")
     
     try:
         # Run the job extraction
-        results = await get_job_postings(website, job_count, search_term)
+        results = await agent.get_job_postings()
         
         print("\n✅ Job extraction completed!")
         print("=" * 50)
@@ -43,34 +52,33 @@ async def main():
         print("=" * 50)
         print(results)
         
-        # Optionally save results to file
-        save_to_file = input("\n💾 Save results to file? (y/N): ").strip().lower()
-        if save_to_file in ['y', 'yes']:
-            filename = f"job_results_{website.replace('https://', '').replace('http://', '').replace('/', '_').replace('.', '_')}.txt"
-            try:
-                with open(filename, 'w', encoding='utf-8') as f:
-                    f.write(f"Job Extraction Results\n")
-                    f.write(f"Website: {website}\n")
-                    f.write(f"Search Term: {search_term}\n")
-                    f.write(f"Date: {asyncio.get_event_loop().time()}\n")
-                    f.write("=" * 50 + "\n")
-                    # Ensure results is converted to string
-                    if isinstance(results, str):
-                        f.write(results)
-                    else:
-                        f.write(str(results))
-                print(f"✅ Results saved to: {filename}")
-            except Exception as file_error:
-                print(f"⚠️  Failed to save file: {str(file_error)}")
-                print("   Results are still displayed above.")
+        # Save results to file
+        filename = "result.txt"
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write(f"Job Extraction Results\n")
+                f.write(f"Website: {website}\n")
+                f.write(f"Search Term: {search_term}\n")
+                f.write(f"Date: {asyncio.get_event_loop().time()}\n")
+                f.write("=" * 50 + "\n")
+                # Ensure results is converted to string
+                if isinstance(results, str):
+                    f.write(results)
+                else:
+                    f.write(str(results))
+            print(f"\n✅ Results saved to: {filename}")
+        except Exception as file_error:
+            print(f"\n⚠️  Failed to save file: {str(file_error)}")
+            print("   Results are still displayed above.")
         
     except Exception as e:
         print(f"\n❌ Error occurred during job extraction:")
         print(f"   {str(e)}")
         print("\n🔧 Please check:")
         print("   - Your internet connection")
-        print("   - The website URL is valid")
+        print("   - The website URL is valid and supported")
         print("   - Your OpenAI API key is configured")
+        print(f"   - Supported websites: {', '.join(get_supported_websites())}")
         return 1
     
     return 0
