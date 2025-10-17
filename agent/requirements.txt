@@ -1,3 +1,4 @@
 browser-use
 playwright
 python-dotenv
+mcp[cli]

@@ -22,6 +22,7 @@ This will install:
 - `browser-use` - Browser automation library
 - `playwright` - Web browser automation framework
 - `python-dotenv` - Environment variable management
+- `mcp[cli]` - Model Context Protocol for AI tool integration
 
 ### 1. Create a Virtual Environment
 
@@ -106,7 +107,8 @@ agent/
 │   ├── abstract_agent.py      # Abstract base class for all agents
 │   ├── agent_factory.py       # Factory to create appropriate agents
 │   ├── itviec_agent.py        # ITViec-specific job crawler
-│   └── vietnamworks_agent.py  # VietnamWorks-specific job crawler
+│   ├── vietnamworks_agent.py  # VietnamWorks-specific job crawler
+│   └── mcp_server.py         # MCP server for AI tool integration
 ├── .env                       # Environment variables configuration
 ├── .env.example              # Environment variables template
 ├── main.py                   # Main entry point to run the application
@@ -171,6 +173,48 @@ This will extract 3 "data science" jobs from vietnamworks.
 - View results in the terminal
 - Results automatically saved to `result.txt`
 - Results include job titles, descriptions, and other relevant information
+
+## MCP Server (AI Tool Integration)
+
+This project includes a **Model Context Protocol (MCP) server** that exposes job scraping functionality as AI tools. This allows AI assistants (like Claude, ChatGPT, or other MCP-compatible clients) to use the job scraping agents directly.
+
+### MCP Features
+
+The MCP server provides two main tools:
+
+- **`get_itviec_job_postings`** - Extract job postings from ITViec.com
+- **`get_vietnamworks_job_postings`** - Extract job postings from VietnamWorks.com
+
+### Running the MCP Server
+
+**For development/testing:**
+
+```powershell
+cd src
+mcp dev mcp_server.py
+```
+
+**For AI assistant integration:**
+
+```powershell
+mcp run src/mcp_server.py
+```
+
+### MCP Tool Parameters
+
+Both tools accept the same parameters:
+
+- **`number_of_jobs`** (int, default: 1) - Number of job postings to retrieve
+- **`search_term`** (string, default: "") - Keywords to search for jobs
+
+### Example MCP Usage
+
+When connected to an AI assistant, you can ask:
+- "Get 5 Python developer jobs from ITViec"
+- "Find data science positions on VietnamWorks"
+- "Search for Java jobs on both platforms"
+
+The AI assistant will automatically call the appropriate MCP tools and present the results.
 
 ## Common Issues
 
